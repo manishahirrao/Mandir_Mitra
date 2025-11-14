@@ -79,10 +79,10 @@ flutter_native_splash:
 flutter:
   uses-material-design: true
 
-  assets:
-    - assets/images/
-    - assets/icons/
-    - assets/animations/
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
+  #   - assets/animations/
 
   # fonts:
   #   - family: Poppins
