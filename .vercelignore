@@ -1,0 +1,53 @@
+# Flutter
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Build (will be rebuilt on Vercel)
+build/
+.build/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Secrets - NEVER deploy these!
+android/key.properties
+android/upload-keystore.jks
+android/**/*.jks
+android/**/*.keystore
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (optional - remove if you want to include)
+*.md
+!README.md
+
+# Test files
+test/
+test_driver/
+integration_test/
+
+# Android/iOS specific (not needed for web)
+android/
+ios/
+linux/
+macos/
+windows/
+
+# Misc
+.DS_Store
+*.log
+*.pyc
+*.swp
+.history/
