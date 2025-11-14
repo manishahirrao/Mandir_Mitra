@@ -1,0 +1,177 @@
+class Ritual {
+  final String id;
+  final String name;
+  final String description;
+  final double price;
+  final String imageUrl;
+  final String category;
+  final String deity;
+  final String templeId;
+  final String templeName;
+  final bool featured;
+  bool isFavorite;
+
+  Ritual({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.imageUrl,
+    required this.category,
+    required this.deity,
+    required this.templeId,
+    required this.templeName,
+    this.featured = false,
+    this.isFavorite = false,
+  });
+
+  // Mock data
+  static List<Ritual> getMockRituals() {
+    return [
+      Ritual(
+        id: '1',
+        name: 'Maa Kali Puja',
+        description: 'Complete Kali puja with all rituals and offerings',
+        price: 2100,
+        imageUrl: 'https://images.unsplash.com/photo-1604608672516-f1b9b1b1c1c1',
+        category: 'Daily Deity Worship',
+        deity: 'Maa Kali',
+        templeId: 't1',
+        templeName: 'Kalighat Temple',
+        featured: true,
+      ),
+      Ritual(
+        id: '2',
+        name: 'Ram Janmabhoomi Darshan',
+        description: 'Special darshan and puja at Ram Janmabhoomi',
+        price: 1500,
+        imageUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220',
+        category: 'Temple Offerings',
+        deity: 'Ram Janmabhoomi',
+        templeId: 't2',
+        templeName: 'Ram Janmabhoomi Temple',
+        featured: true,
+      ),
+      Ritual(
+        id: '3',
+        name: 'Maa Tara Sadhana',
+        description: 'Powerful Tara sadhana for protection and prosperity',
+        price: 3500,
+        imageUrl: 'https://images.unsplash.com/photo-1609619385002-f40f5e5c73b0',
+        category: 'Personal Benefits',
+        deity: 'Maa Tara',
+        templeId: 't3',
+        templeName: 'Tarapith Temple',
+        featured: true,
+      ),
+      Ritual(
+        id: '4',
+        name: 'Maa Shodashi Puja',
+        description: 'Divine puja for beauty, grace and spiritual growth',
+        price: 4200,
+        imageUrl: 'https://images.unsplash.com/photo-1548625149-fc4a29cf7092',
+        category: 'Special Occasions',
+        deity: 'Maa Shodashi',
+        templeId: 't4',
+        templeName: 'Kamakhya Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '5',
+        name: 'Maa Bhuvaneshwari Havan',
+        description: 'Sacred havan for universal prosperity and peace',
+        price: 3800,
+        imageUrl: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617',
+        category: 'Daily Deity Worship',
+        deity: 'Maa Bhuvaneshwari',
+        templeId: 't5',
+        templeName: 'Bhuvaneshwari Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '6',
+        name: 'Maa Bagalamukhi Puja',
+        description: 'Powerful puja for victory over enemies and obstacles',
+        price: 5001,
+        imageUrl: 'https://images.unsplash.com/photo-1599639957043-f3aa5c986398',
+        category: 'Astrological Doshas',
+        deity: 'Maa Bagalamukhi',
+        templeId: 't6',
+        templeName: 'Bagalamukhi Temple',
+        featured: true,
+      ),
+      Ritual(
+        id: '7',
+        name: 'Satyanarayan Katha',
+        description: 'Complete Satyanarayan puja with katha and prasad',
+        price: 1800,
+        imageUrl: 'https://images.unsplash.com/photo-1580477667995-2b94f01c9516',
+        category: 'Special Occasions',
+        deity: 'Lord Vishnu',
+        templeId: 't7',
+        templeName: 'Vishnu Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '8',
+        name: 'Ganesh Chaturthi Puja',
+        description: 'Special Ganesh puja for new beginnings',
+        price: 2500,
+        imageUrl: 'https://images.unsplash.com/photo-1597059171311-1242c0f9c5e4',
+        category: 'Special Occasions',
+        deity: 'Lord Ganesh',
+        templeId: 't8',
+        templeName: 'Siddhivinayak Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '9',
+        name: 'Navagraha Shanti Puja',
+        description: 'Complete puja for planetary peace and harmony',
+        price: 4500,
+        imageUrl: 'https://images.unsplash.com/photo-1609619385002-f40f5e5c73b0',
+        category: 'Astrological Doshas',
+        deity: 'Navagraha',
+        templeId: 't9',
+        templeName: 'Navagraha Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '10',
+        name: 'Lakshmi Puja',
+        description: 'Divine puja for wealth and prosperity',
+        price: 2200,
+        imageUrl: 'https://images.unsplash.com/photo-1604608672516-f1b9b1b1c1c1',
+        category: 'Personal Benefits',
+        deity: 'Maa Lakshmi',
+        templeId: 't10',
+        templeName: 'Lakshmi Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '11',
+        name: 'Durga Saptashati Path',
+        description: 'Complete recitation of Durga Saptashati',
+        price: 3100,
+        imageUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220',
+        category: 'Daily Deity Worship',
+        deity: 'Maa Durga',
+        templeId: 't11',
+        templeName: 'Durga Temple',
+        featured: false,
+      ),
+      Ritual(
+        id: '12',
+        name: 'Hanuman Chalisa Path',
+        description: 'Sacred recitation for strength and protection',
+        price: 801,
+        imageUrl: 'https://images.unsplash.com/photo-1548625149-fc4a29cf7092',
+        category: 'Daily Deity Worship',
+        deity: 'Lord Hanuman',
+        templeId: 't12',
+        templeName: 'Hanuman Temple',
+        featured: false,
+      ),
+    ];
+  }
+}
