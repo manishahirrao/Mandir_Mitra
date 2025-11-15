@@ -26,6 +26,8 @@ import 'services/settings_provider.dart';
 import 'services/connectivity_service.dart';
 import 'services/sync_provider.dart';
 import 'services/queue_manager.dart';
+import 'services/chadhava_provider.dart';
+import 'services/temple_provider.dart';
 import 'widgets/common/offline_banner.dart';
 import 'models/app_settings.dart';
 
@@ -88,6 +90,8 @@ class MandirMitraApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReviewProvider()),
         ChangeNotifierProvider(create: (_) => BlogProvider()),
         ChangeNotifierProvider(create: (_) => FAQProvider()),
+        ChangeNotifierProvider(create: (_) => ChadhavaProvider()),
+        ChangeNotifierProvider(create: (_) => TempleProvider()),
         
         // Feature Providers
         ChangeNotifierProvider(create: (_) => LoyaltyProvider()),

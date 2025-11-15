@@ -24,6 +24,7 @@ dependencies:
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
   lottie: ^2.7.0
+  google_fonts: ^6.1.0
 
   # Connectivity & Offline
   connectivity_plus: ^5.0.0

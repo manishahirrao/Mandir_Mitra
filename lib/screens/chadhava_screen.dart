@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/temple_provider.dart';
+import '../services/chadhava_provider.dart';
 import '../utils/app_theme.dart';
-import '../widgets/temples/temple_card.dart';
-import '../widgets/temples/featured_temple_spotlight.dart';
-import '../widgets/temples/temple_category_filter.dart';
-import 'temple_detail_screen.dart';
-import 'temple_comparison_screen.dart';
+import '../widgets/chadhava/category_filter.dart';
+import '../widgets/chadhava/featured_banner.dart';
+import '../widgets/chadhava/chadhava_card.dart';
+import 'chadhava_detail_screen.dart';
+import 'multi_temple_chadhava_screen.dart';
 
-class TemplesScreen extends StatefulWidget {
-  const TemplesScreen({super.key});
+class ChadhavaScreen extends StatefulWidget {
+  const ChadhavaScreen({Key? key}) : super(key: key);
 
   @override
-  State<TemplesScreen> createState() => _TemplesScreenState();
+  State<ChadhavaScreen> createState() => _ChadhavaScreenState();
 }
 
-class _TemplesScreenState extends State<TemplesScreen> {
+class _ChadhavaScreenState extends State<ChadhavaScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -23,7 +23,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TempleProvider>().loadTemples();
+      context.read<ChadhavaProvider>().loadChadhavas();
     });
   }
 
@@ -42,7 +42,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
           children: [
             _buildHeader(),
             Expanded(
-              child: Consumer<TempleProvider>(
+              child: Consumer<ChadhavaProvider>(
                 builder: (context, provider, child) {
                   if (provider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -58,7 +58,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
                           Text(provider.error!),
                           const SizedBox(height: 16),
                           ElevatedButton(
-                            onPressed: () => provider.loadTemples(),
+                            onPressed: () => provider.loadChadhavas(),
                             child: const Text('Retry'),
                           ),
                         ],
@@ -68,27 +68,9 @@ class _TemplesScreenState extends State<TemplesScreen> {
 
                   return CustomScrollView(
                     slivers: [
-                      // Featured Temple Spotlight
-                      if (provider.featuredTemple != null)
-                        SliverToBoxAdapter(
-                          child: FeaturedTempleSpotlight(
-                            temple: provider.featuredTemple!,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TempleDetailScreen(
-                                    temple: provider.featuredTemple!,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
                       // Category Filter
                       SliverToBoxAdapter(
-                        child: TempleCategoryFilter(
+                        child: CategoryFilter(
                           categories: provider.categories,
                           selectedCategory: provider.selectedCategory,
                           onCategorySelected: (category) {
@@ -97,74 +79,66 @@ class _TemplesScreenState extends State<TemplesScreen> {
                         ),
                       ),
 
+                      // Featured Banner
+                      if (provider.multiTempleChadhavas.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: FeaturedBanner(
+                            multiTempleChadhava: provider.multiTempleChadhavas.first,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MultiTempleChadhavaScreen(
+                                    multiTempleChadhava: provider.multiTempleChadhavas.first,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
                       // Section Title
                       SliverToBoxAdapter(
                         child: Padding(
                           padding: const EdgeInsets.all(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _getSectionTitle(provider.selectedCategory),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (provider.comparisonList.isNotEmpty)
-                                TextButton.icon(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const TempleComparisonScreen(),
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.compare_arrows),
-                                  label: Text('Compare (${provider.comparisonList.length})'),
-                                ),
-                            ],
+                          child: Text(
+                            _getSectionTitle(provider.selectedCategory),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
 
-                      // Temple Grid
+                      // Chadhava Grid
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         sliver: SliverGrid(
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.7,
+                            childAspectRatio: 0.75,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              final temple = _getFilteredTemples(provider)[index];
-                              return TempleCard(
-                                temple: temple,
+                              final chadhava = _getFilteredChadhavas(provider)[index];
+                              return ChadhavaCard(
+                                chadhava: chadhava,
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => TempleDetailScreen(
-                                        temple: temple,
+                                      builder: (context) => ChadhavaDetailScreen(
+                                        chadhava: chadhava,
                                       ),
                                     ),
                                   );
                                 },
-                                onCompareToggle: () {
-                                  if (provider.comparisonList.any((t) => t.id == temple.id)) {
-                                    provider.removeFromComparison(temple);
-                                  } else {
-                                    provider.addToComparison(temple);
-                                  }
-                                },
-                                isInComparison: provider.comparisonList.any((t) => t.id == temple.id),
                               );
                             },
-                            childCount: _getFilteredTemples(provider).length,
+                            childCount: _getFilteredChadhavas(provider).length,
                           ),
                         ),
                       ),
@@ -200,7 +174,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Sacred Temples',
+            'Offer Chadhava',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -208,7 +182,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Offer prayers at ancient holy shrines',
+            'Present offerings to your beloved deities',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[600],
@@ -218,7 +192,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
           TextField(
             controller: _searchController,
             decoration: InputDecoration(
-              hintText: 'Search temples...',
+              hintText: 'Search chadhava...',
               prefixIcon: const Icon(Icons.search),
               suffixIcon: _searchQuery.isNotEmpty
                   ? IconButton(
@@ -228,7 +202,7 @@ class _TemplesScreenState extends State<TemplesScreen> {
                         setState(() => _searchQuery = '');
                       },
                     )
-                  : const Icon(Icons.filter_list),
+                  : null,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Colors.grey[300]!),
@@ -255,22 +229,35 @@ class _TemplesScreenState extends State<TemplesScreen> {
   }
 
   String _getSectionTitle(String category) {
-    if (category == 'All Temples') return 'All Temples';
-    return category;
+    switch (category) {
+      case 'All':
+        return 'All Chadhava';
+      case 'Daily Deity':
+        return 'Daily Deity Chadhava';
+      case 'Ekadashi':
+        return 'Ekadashi Special';
+      case 'Gauseva':
+        return 'Gauseva Offerings';
+      case 'Success & Growth':
+        return 'Success & Growth';
+      case 'Health & Healing':
+        return 'Health & Healing';
+      default:
+        return category;
+    }
   }
 
-  List _getFilteredTemples(TempleProvider provider) {
-    var temples = provider.filteredTemples;
+  List _getFilteredChadhavas(ChadhavaProvider provider) {
+    var chadhavas = provider.filteredChadhavas;
     
     if (_searchQuery.isNotEmpty) {
-      temples = temples.where((t) {
-        return t.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            t.location.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            t.city.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            (t.presidingDeity?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
+      chadhavas = chadhavas.where((c) {
+        return c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            c.deityName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            c.description.toLowerCase().contains(_searchQuery.toLowerCase());
       }).toList();
     }
     
-    return temples;
+    return chadhavas;
   }
 }
