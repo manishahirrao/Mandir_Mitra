@@ -74,30 +74,4 @@ class AppTheme {
     ),
   );
 
-  static final ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: sacredBlue,
-      brightness: Brightness.dark,
-      primary: sacredBlue,
-      secondary: goldenAccent,
-      error: errorRed,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1A1A1A),
-      foregroundColor: Colors.white,
-      elevation: 0,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: sacredBlue,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    ),
-  );
 }

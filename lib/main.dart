@@ -114,10 +114,9 @@ class MandirMitraApp extends StatelessWidget {
               title: 'Mandir Mitra',
               debugShowCheckedModeBanner: false,
               
-              // Theme
+              // Theme - Light mode only
               theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: _getThemeMode(settings.settings.themeMode),
+              themeMode: ThemeMode.light,
               
               // Localization
               locale: _getLocale(settings.settings.language),
@@ -157,17 +156,6 @@ class MandirMitraApp extends StatelessWidget {
         },
       ),
     );
-  }
-
-  ThemeMode _getThemeMode(AppThemeMode mode) {
-    switch (mode) {
-      case AppThemeMode.light:
-        return ThemeMode.light;
-      case AppThemeMode.dark:
-        return ThemeMode.dark;
-      case AppThemeMode.system:
-        return ThemeMode.system;
-    }
   }
 
   Locale _getLocale(AppLanguage language) {

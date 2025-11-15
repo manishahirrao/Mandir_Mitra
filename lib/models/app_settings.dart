@@ -8,8 +8,6 @@ enum AppLanguage {
 
 enum AppThemeMode {
   light,
-  dark,
-  system,
 }
 
 enum FontSize {
@@ -48,7 +46,7 @@ class AppSettings {
 
   AppSettings({
     this.language = AppLanguage.english,
-    this.themeMode = AppThemeMode.system,
+    this.themeMode = AppThemeMode.light,
     this.fontSize = FontSize.defaultSize,
     this.notificationsEnabled = true,
     this.soundEnabled = true,
@@ -133,10 +131,7 @@ class AppSettings {
         (e) => e.toString() == json['language'],
         orElse: () => AppLanguage.english,
       ),
-      themeMode: AppThemeMode.values.firstWhere(
-        (e) => e.toString() == json['themeMode'],
-        orElse: () => AppThemeMode.system,
-      ),
+      themeMode: AppThemeMode.light,
       fontSize: FontSize.values.firstWhere(
         (e) => e.toString() == json['fontSize'],
         orElse: () => FontSize.defaultSize,
