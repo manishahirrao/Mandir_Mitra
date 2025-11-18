@@ -26,8 +26,8 @@ class TempleCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -54,27 +54,24 @@ class TempleCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: 8,
+                  bottom: 8,
                   right: 8,
-                  child: GestureDetector(
-                    onTap: onCompareToggle,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: isInComparison ? AppTheme.primaryOrange : Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.compare_arrows,
-                        size: 16,
-                        color: isInComparison ? Colors.white : Colors.grey[700],
-                      ),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.add_circle_outline,
+                      size: 20,
+                      color: Color(0xFF2D3748),
                     ),
                   ),
                 ),
@@ -84,82 +81,31 @@ class TempleCard extends StatelessWidget {
             // Content
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       temple.name,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3748),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            temple.state,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${temple.rating}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          ' (${_formatReviewCount(temple.reviewCount)})',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+                    Text(
+                      '${temple.city}, ${temple.state}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[600],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryOrange,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'View Services',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          Icon(Icons.arrow_forward, color: Colors.white, size: 14),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),

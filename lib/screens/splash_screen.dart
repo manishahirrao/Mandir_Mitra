@@ -42,19 +42,23 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
     
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final hasCompletedOnboarding = await authProvider.hasCompletedOnboarding();
+    
+    // Check if user is authenticated
+    final isAuthenticated = authProvider.isAuthenticated;
     
     if (!mounted) return;
     
-    if (!hasCompletedOnboarding) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
-      );
-    } else {
+    if (isAuthenticated) {
+      // User is logged in, go to main app
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const MainNavigation()),
+      );
+    } else {
+      // User not logged in, show onboarding
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
       );
     }
   }

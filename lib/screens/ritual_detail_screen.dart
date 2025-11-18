@@ -47,28 +47,66 @@ class _RitualDetailScreenState extends State<RitualDetailScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 380,
+                expandedHeight: 300,
                 pinned: true,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Navigator.pop(context),
+                backgroundColor: Colors.white,
+                leading: Container(
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: WishlistButton(
-                      ritualId: widget.ritual.id,
-                      size: 24,
+                  Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.favorite_border, color: Colors.black),
+                      onPressed: () {},
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.share),
-                    onPressed: _showShareOptions,
+                  Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.share, color: Colors.black),
+                      onPressed: _showShareOptions,
+                    ),
                   ),
                 ],
                 flexibleSpace: FlexibleSpaceBar(
@@ -80,13 +118,12 @@ class _RitualDetailScreenState extends State<RitualDetailScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildRitualInfo(),
-                    const Divider(),
                     _buildPackageSelector(),
-                    const Divider(),
                     _buildTabSection(),
-                    _buildTempleInfo(),
+                    _buildPujaProcess(),
+                    _buildPujaBenefits(),
                     _buildFAQs(),
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -100,54 +137,66 @@ class _RitualDetailScreenState extends State<RitualDetailScreen>
 
   Widget _buildRitualInfo() {
     return Padding(
-      padding: const EdgeInsets.all(AppTheme.spaceLG),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.ritual.name,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppTheme.templeBrown,
-                ),
-          ),
-          const SizedBox(height: AppTheme.spaceSM),
-          InkWell(
-            onTap: () {},
-            child: Row(
-              children: [
-                const Icon(Icons.location_on, size: 16, color: AppTheme.earthTones),
-                const SizedBox(width: 4),
-                Text(
-                  widget.ritual.templeName,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.divineGold,
-                        decoration: TextDecoration.underline,
-                      ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppTheme.spaceSM),
           Row(
             children: [
-              ...List.generate(5, (index) {
-                return Icon(
-                  index < 4 ? Icons.star : Icons.star_half,
-                  color: AppTheme.saffronYellow,
-                  size: 20,
-                );
-              }),
-              const SizedBox(width: 8),
-              Text(
-                '4.5/5 (127 reviews)',
-                style: Theme.of(context).textTheme.bodyMedium,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  '18,000 Puja Performed',
+                  style: TextStyle(
+                    color: Color(0xFFFF8C42),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: AppTheme.spaceMD),
+          const SizedBox(height: 12),
+          Text(
+            widget.ritual.name,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              ...List.generate(5, (index) {
+                return const Icon(
+                  Icons.star,
+                  color: Color(0xFFFFB800),
+                  size: 18,
+                );
+              }),
+              const SizedBox(width: 8),
+              const Text(
+                '4.8 (2.5k reviews)',
+                style: TextStyle(
+                  color: Color(0xFF6B7280),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           Text(
             widget.ritual.description,
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: const TextStyle(
+              fontSize: 15,
+              color: Color(0xFF4B5563),
+              height: 1.5,
+            ),
             maxLines: _isExpanded ? null : 3,
             overflow: _isExpanded ? null : TextOverflow.ellipsis,
           ),
@@ -157,7 +206,151 @@ class _RitualDetailScreenState extends State<RitualDetailScreen>
                 _isExpanded = !_isExpanded;
               });
             },
-            child: Text(_isExpanded ? 'Read Less' : 'Read More'),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(0, 0),
+            ),
+            child: Text(
+              _isExpanded ? 'Read Less' : 'Read More',
+              style: const TextStyle(
+                color: Color(0xFFFF8C42),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPujaProcess() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Puja Process',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildProcessStep('1', 'Sankalp', 'Taking the resolution for the puja'),
+          _buildProcessStep('2', 'Ganesh Puja', 'Invoking Lord Ganesha'),
+          _buildProcessStep('3', 'Kalash Sthapana', 'Establishing the sacred pot'),
+          _buildProcessStep('4', 'Main Puja', 'Performing the main ritual'),
+          _buildProcessStep('5', 'Aarti & Prasad', 'Final offerings and blessings'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProcessStep(String number, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF8C42),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2D3748),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF6B7280),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPujaBenefits() {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8F0),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Puja Benefits',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildBenefitItem('Removes obstacles and negativity'),
+          _buildBenefitItem('Brings prosperity and success'),
+          _buildBenefitItem('Provides divine protection'),
+          _buildBenefitItem('Fulfills wishes and desires'),
+          _buildBenefitItem('Brings peace and harmony'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBenefitItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(
+            Icons.check_circle,
+            color: Color(0xFF10B981),
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 15,
+                color: Color(0xFF4B5563),
+              ),
+            ),
           ),
         ],
       ),
@@ -166,14 +359,98 @@ class _RitualDetailScreenState extends State<RitualDetailScreen>
 
   Widget _buildPackageSelector() {
     return Padding(
-      padding: const EdgeInsets.all(AppTheme.spaceLG),
-      child: PackageSelector(
-        onPackageSelected: (package, price) {
-          setState(() {
-            _selectedPackage = package;
-            _selectedPrice = price;
-          });
-        },
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Select Puja Package',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildPackageOption('Basic', 299, 'Essential puja items'),
+          _buildPackageOption('Standard', 501, 'Complete puja with prasad'),
+          _buildPackageOption('Premium', 1001, 'Full puja with live streaming'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPackageOption(String name, double price, String description) {
+    final isSelected = _selectedPackage == '$name Package';
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedPackage = '$name Package';
+          _selectedPrice = price;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFFFF8F0) : Colors.white,
+          border: Border.all(
+            color: isSelected ? const Color(0xFFFF8C42) : const Color(0xFFE5E7EB),
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? const Color(0xFFFF8C42) : const Color(0xFFD1D5DB),
+                  width: 2,
+                ),
+                color: isSelected ? const Color(0xFFFF8C42) : Colors.transparent,
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 12, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? const Color(0xFFFF8C42) : const Color(0xFF2D3748),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF6B7280),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Text(
+              '₹${price.toInt()}',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? const Color(0xFFFF8C42) : const Color(0xFF2D3748),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -513,50 +790,51 @@ class _RitualDetailScreenState extends State<RitualDetailScreen>
       left: 0,
       right: 0,
       child: Container(
-        padding: const EdgeInsets.all(AppTheme.spaceMD),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppTheme.sacredWhite,
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: AppTheme.sacredGrey.withOpacity(0.2),
-              blurRadius: 10,
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
               offset: const Offset(0, -5),
             ),
           ],
         ),
         child: SafeArea(
-          child: Row(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Total Price',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  Text(
-                    '₹${_selectedPrice.toStringAsFixed(0)}',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: AppTheme.divineGold,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ],
+          child: ElevatedButton(
+            onPressed: _handleBookNow,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: const Color(0xFF10B981),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(width: AppTheme.spaceMD),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _handleBookNow,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: AppTheme.spaceMD),
-                    backgroundColor: AppTheme.divineGold,
-                    foregroundColor: Colors.white,
+              elevation: 0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Book Puja',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: const Text('Book Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward, size: 20),
+                const Spacer(),
+                Text(
+                  '₹${_selectedPrice.toInt()}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

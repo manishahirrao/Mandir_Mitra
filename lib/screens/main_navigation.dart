@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/app_theme.dart';
+import '../utils/navigation_helper.dart';
+import '../services/user_provider.dart';
 import 'home_screen.dart';
 import 'services_screen.dart';
 import 'temples_screen.dart';
 import 'chadavas_screen.dart';
 import 'personal_ritual_screen.dart';
-import 'profile_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -23,7 +25,7 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppTheme.sacredBlue,
+        backgroundColor: const Color(0xFFFFF8F0),
         elevation: 0,
         leading: Builder(
           builder: (context) => IconButton(
@@ -31,12 +33,12 @@ class _MainNavigationState extends State<MainNavigation> {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: const Color(0xFFFF8C42), width: 2),
               ),
               child: const CircleAvatar(
-                backgroundColor: Colors.white,
+                backgroundColor: Color(0xFFFFE5D0),
                 radius: 16,
-                child: Icon(Icons.person, color: AppTheme.sacredBlue, size: 20),
+                child: Icon(Icons.person, color: Color(0xFFFF8C42), size: 20),
               ),
             ),
             onPressed: () {
@@ -47,7 +49,7 @@ class _MainNavigationState extends State<MainNavigation> {
         title: Text(
           _getTitle(),
           style: const TextStyle(
-            color: Colors.white,
+            color: Color(0xFF2D3748),
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -57,14 +59,14 @@ class _MainNavigationState extends State<MainNavigation> {
           IconButton(
             icon: Stack(
               children: [
-                const Icon(Icons.notifications_outlined, color: Colors.white),
+                const Icon(Icons.notifications_outlined, color: Color(0xFF2D3748)),
                 Positioned(
                   right: 0,
                   top: 0,
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
-                      color: AppTheme.errorRed,
+                      color: Color(0xFFFF8C42),
                       shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(
@@ -76,7 +78,7 @@ class _MainNavigationState extends State<MainNavigation> {
               ],
             ),
             onPressed: () {
-              // Navigator.pushNamed(context, '/notifications');
+              NavigationHelper.navigateToNotifications(context);
             },
           ),
           const SizedBox(width: 8),
@@ -128,144 +130,227 @@ class _MainNavigationState extends State<MainNavigation> {
 
   Widget _buildProfileDrawer(BuildContext context) {
     return Drawer(
+      backgroundColor: const Color(0xFFF5F5F5),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Profile Header
+            Consumer<UserProvider>(
+              builder: (context, userProvider, child) {
+                final user = userProvider.user;
+                return Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 35,
+                        backgroundColor: Colors.grey[300],
+                        backgroundImage: user?.profilePhoto != null ? NetworkImage(user!.profilePhoto!) : null,
+                        child: user?.profilePhoto == null ? const Icon(Icons.person, size: 35, color: Colors.grey) : null,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user?.fullName ?? 'User Name',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Complete your Profile',
+                              style: TextStyle(fontSize: 14, color: Color(0xFFFF8C42), fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            // Stats Cards
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(child: _buildStatCard('Punya\nMudra', '1,200')),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildStatCard('Bhakti\nChakra', '75%')),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildStatCard('Attendance', '15 Days')),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Help Centre & Language
+            _buildDrawerTile(Icons.help_outline, 'Help Centre', () {}),
+            _buildDrawerTileWithToggle(Icons.language, 'English Mode'),
+            const SizedBox(height: 16),
+            // Primary Actions
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Primary Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFFF8C42))),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      NavigationHelper.navigateToLovedOnes(context);
+                    },
+                    child: _buildActionButton(Icons.group_add, 'Add your loved ones on Sri Mandir'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Main Menu Items
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  const Text('Main Menu Items', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
+                  const SizedBox(height: 12),
+                  _buildMenuItem(Icons.person_outline, 'My Profile', () => NavigationHelper.navigateToProfile(context), isHighlighted: true),
+                  _buildMenuItem(Icons.calendar_today_outlined, 'My Bookings', () => NavigationHelper.navigateToMyRituals(context)),
+                  _buildMenuItem(Icons.volunteer_activism_outlined, 'Offer Chadhava Today', () {}),
+                  _buildMenuItem(Icons.book_outlined, 'Book Puja with Sri Mandir', () {}),
+                  const SizedBox(height: 20),
+                  const Text('Other Services', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
+                  const SizedBox(height: 12),
+                  _buildMenuItem(Icons.translate, 'Change the language', () {}),
+                  _buildMenuItem(Icons.star_outline, 'Rate on Playstore', () {}),
+                  _buildMenuItem(Icons.favorite_outline, 'Wishlist', () => NavigationHelper.navigateToWishlist(context)),
+                  _buildMenuItem(Icons.card_giftcard, 'Loyalty & Rewards', () => NavigationHelper.navigateToLoyalty(context)),
+                  _buildMenuItem(Icons.settings, 'Settings', () => NavigationHelper.navigateToSettings(context)),
+                  _buildMenuItem(Icons.help_outline, 'Help & Support', () => NavigationHelper.navigateToHelpSupport(context)),
+                  _buildMenuItem(Icons.info_outline, 'About', () => NavigationHelper.navigateToAbout(context)),
+                  const SizedBox(height: 12),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.logout, color: AppTheme.errorRed, size: 22),
+                      title: const Text('Logout', style: TextStyle(fontSize: 15, color: AppTheme.errorRed)),
+                      onTap: () {
+                        Navigator.pop(context);
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Logout'),
+                            content: const Text('Are you sure you want to logout?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  // Add logout logic here
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Logged out successfully')),
+                                  );
+                                },
+                                child: const Text('Logout'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+      ),
       child: Column(
         children: [
-          // Profile Header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-            decoration: const BoxDecoration(
-              gradient: AppTheme.sacredGradient,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const CircleAvatar(
-                  radius: 40,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 40, color: AppTheme.sacredBlue),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Guest User',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'guest@mandirmitra.com',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Menu Items
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildDrawerItem(
-                  icon: Icons.person,
-                  title: 'My Profile',
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.calendar_today,
-                  title: 'My Rituals',
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() => _currentIndex = 1);
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.favorite_outline,
-                  title: 'Wishlist',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigator.pushNamed(context, '/wishlist');
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.card_giftcard,
-                  title: 'Loyalty & Rewards',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigator.pushNamed(context, '/loyalty');
-                  },
-                ),
-                const Divider(),
-                _buildDrawerItem(
-                  icon: Icons.settings,
-                  title: 'Settings',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigator.pushNamed(context, '/settings');
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.help_outline,
-                  title: 'Help & Support',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigator.pushNamed(context, '/faq');
-                  },
-                ),
-                _buildDrawerItem(
-                  icon: Icons.info_outline,
-                  title: 'About',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Navigator.pushNamed(context, '/about');
-                  },
-                ),
-                const Divider(),
-                _buildDrawerItem(
-                  icon: Icons.logout,
-                  title: 'Logout',
-                  textColor: AppTheme.errorRed,
-                  onTap: () {
-                    Navigator.pop(context);
-                    // Add logout logic
-                  },
-                ),
-              ],
-            ),
-          ),
+          Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)), textAlign: TextAlign.center),
+          const SizedBox(height: 4),
+          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3748))),
         ],
       ),
     );
   }
 
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    Color? textColor,
-  }) {
+  Widget _buildDrawerTile(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: textColor ?? AppTheme.sacredBlue),
-      title: Text(
-        title,
-        style: TextStyle(
-          color: textColor ?? AppTheme.sacredGrey,
-          fontWeight: FontWeight.w500,
-        ),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: const Color(0xFFFFE5D0), borderRadius: BorderRadius.circular(8)),
+        child: Icon(icon, color: const Color(0xFFFF8C42), size: 20),
       ),
+      title: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF2D3748))),
+      trailing: const Icon(Icons.chevron_right, color: Color(0xFF6B7280)),
       onTap: onTap,
     );
   }
+
+  Widget _buildDrawerTileWithToggle(IconData icon, String title) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: const Color(0xFFFFE5D0), borderRadius: BorderRadius.circular(8)),
+        child: Icon(icon, color: const Color(0xFFFF8C42), size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF2D3748))),
+      trailing: Switch(value: true, onChanged: (v) {}, activeColor: const Color(0xFFFF8C42)),
+    );
+  }
+
+  Widget _buildActionButton(IconData icon, String title) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: const Color(0xFFFFE5D0), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFFF8C42)),
+          const SizedBox(width: 12),
+          Expanded(child: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF2D3748)))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap, {bool isHighlighted = false}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: isHighlighted ? const Color(0xFFFFE5D0) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: const Color(0xFFFF8C42), size: 22),
+        title: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF2D3748))),
+        onTap: () {
+          Navigator.pop(context);
+          onTap();
+        },
+      ),
+    );
+  }
+
+
 
   Widget _buildPremiumBottomNav() {
     return Container(

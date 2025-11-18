@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_theme.dart';
+import '../../utils/navigation_helper.dart';
 
 class ServiceCategoriesGrid extends StatelessWidget {
   const ServiceCategoriesGrid({super.key});
@@ -28,12 +29,48 @@ class ServiceCategoriesGrid extends StatelessWidget {
             crossAxisSpacing: 12,
             childAspectRatio: 1.2,
             children: [
-              _buildServiceCard('🙏', 'Personal\nRituals', 'Book for yourself'),
-              _buildServiceCard('👥', 'Public\nRituals', 'Join group pujas'),
-              _buildServiceCard('🪔', 'Chadhava', 'Offer prasad'),
-              _buildServiceCard('🛕', 'Temple\nServices', 'Visit temples'),
-              _buildServiceCard('📜', 'Custom\nPuja', 'Personalized rituals'),
-              
+              _buildServiceCard(
+                context,
+                '🙏',
+                'Personal\nRituals',
+                'Book for yourself',
+                () => NavigationHelper.navigateToPersonalRitual(context),
+              ),
+              _buildServiceCard(
+                context,
+                '👥',
+                'Public\nRituals',
+                'Join group pujas',
+                () => NavigationHelper.navigateToServices(context),
+              ),
+              _buildServiceCard(
+                context,
+                '🪔',
+                'Chadhava',
+                'Offer prasad',
+                () => NavigationHelper.navigateToChadhava(context),
+              ),
+              _buildServiceCard(
+                context,
+                '🛕',
+                'Temple\nServices',
+                'Visit temples',
+                () => NavigationHelper.navigateToTemples(context),
+              ),
+              _buildServiceCard(
+                context,
+                '📜',
+                'Custom\nPuja',
+                'Personalized rituals',
+                () => NavigationHelper.navigateToPersonalRitual(context),
+              ),
+              _buildServiceCard(
+                context,
+                '🎁',
+                'Loyalty\nRewards',
+                'Earn points',
+                () => NavigationHelper.navigateToLoyalty(context),
+              ),
             ],
           ),
         ],
@@ -41,7 +78,13 @@ class ServiceCategoriesGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceCard(String emoji, String title, String subtitle) {
+  Widget _buildServiceCard(
+    BuildContext context,
+    String emoji,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -64,7 +107,7 @@ class ServiceCategoriesGrid extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: onTap,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),

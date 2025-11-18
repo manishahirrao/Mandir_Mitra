@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/user_provider.dart';
 import '../services/auth_provider.dart';
 import '../widgets/profile/menu_item.dart';
 import '../utils/app_theme.dart';
@@ -16,36 +15,36 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: AppTheme.sacredBlue,
-        foregroundColor: Colors.white,
-      ),
-      body: Consumer<UserProvider>(
-        builder: (context, userProvider, child) {
-          final user = userProvider.user;
-          if (user == null) {
-            return const Center(child: Text('Please login'));
-          }
-
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          final user = authProvider.user;
           return SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildProfileHeader(context, user),
-                const SizedBox(height: 16),
-                _buildAccountSection(context),
-                const SizedBox(height: 16),
-                _buildOrdersSection(context),
-                const SizedBox(height: 16),
-                _buildSpiritualSection(context),
-                const SizedBox(height: 16),
-                _buildContentSection(context),
-                const SizedBox(height: 16),
-                _buildSupportSection(context),
-                const SizedBox(height: 16),
-                _buildSettingsSection(context),
-                const SizedBox(height: 16),
-                _buildAccountActions(context, userProvider),
+                const SizedBox(height: 24),
+                _buildSection('My Account', [
+                  _buildMenuItem(Icons.person_outline, 'Personal Details', () {}),
+                  _buildMenuItem(Icons.security, 'Security', () {}),
+                  _buildMenuItem(Icons.link, 'Linked Accounts', () {}),
+                ]),
+                const SizedBox(height: 24),
+                _buildSection('My Activity', [
+                  _buildMenuItem(Icons.history, 'Booking History', () {}),
+                  _buildMenuItem(Icons.volunteer_activism_outlined, 'Chadhava History', () {}),
+                  _buildMenuItem(Icons.bookmark_outline, 'Saved Items', () {}),
+                ]),
+                const SizedBox(height: 24),
+                _buildSection('Settings', [
+                  _buildMenuItem(Icons.notifications_outlined, 'Notifications', () {}),
+                  _buildMenuItem(Icons.language, 'Language', () {}),
+                  _buildMenuItem(Icons.dark_mode_outlined, 'Theme', () {}),
+                  _buildMenuItem(Icons.privacy_tip_outlined, 'Privacy Policy', () {}),
+                ]),
+                const SizedBox(height: 24),
+                _buildLogoutButton(context, authProvider),
                 const SizedBox(height: 24),
               ],
             ),
@@ -56,6 +55,123 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileHeader(BuildContext context, user) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      color: Colors.white,
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: user?.profilePhoto != null ? NetworkImage(user!.profilePhoto!) : null,
+                child: user?.profilePhoto == null ? const Icon(Icons.person, size: 60, color: Colors.grey) : null,
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF8C42),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            user?.fullName ?? 'Siddharth Sharma',
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            user?.email ?? 'siddharth.sharma@email.com',
+            style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection(String title, List<Widget> items) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFFF8C42))),
+          ),
+          const SizedBox(height: 8),
+          ...items,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: const Color(0xFFFFE5D0), borderRadius: BorderRadius.circular(8)),
+        child: Icon(icon, color: const Color(0xFFFF8C42), size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF2D3748))),
+      trailing: const Icon(Icons.chevron_right, color: Color(0xFF6B7280)),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context, AuthProvider authProvider) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: ElevatedButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Logout'),
+              content: const Text('Are you sure you want to logout?'),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    authProvider.logout();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                  },
+                  child: const Text('Logout', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFFE5E5),
+          foregroundColor: Colors.red,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 0,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.logout, size: 20),
+            SizedBox(width: 8),
+            Text('Logout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOldProfileHeader(BuildContext context, user, AuthProvider authProvider) {
     return Container(
       padding: const EdgeInsets.all(24),
       color: AppTheme.sacredBlue.withOpacity(0.05),
@@ -94,58 +210,120 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            user.name,
+            user.fullName,
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: AppTheme.templeBrown,
+              color: AppTheme.sacredBlue,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
             user.email,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
           ),
-          const SizedBox(height: 4),
+          if (user.phone != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              user.phone!,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                user.phone,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: user.isVerified ? Colors.green : Colors.orange,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      user.isVerified ? Icons.verified : Icons.pending,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      user.isVerified ? 'Verified' : 'Not Verified',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              if (user.isPhoneVerified) ...[
-                const SizedBox(width: 4),
-                const Icon(Icons.verified, size: 16, color: AppTheme.successGreen),
-              ],
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppTheme.divineGold,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.stars,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${user.loyaltyPoints} pts',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          OutlinedButton(
+          ElevatedButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit profile feature coming soon')),
-              );
+              _showEditProfileDialog(context, authProvider);
             },
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppTheme.sacredBlue),
-              foregroundColor: AppTheme.sacredBlue,
+            icon: const Icon(Icons.edit, size: 18),
+            label: const Text('Edit Profile'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.sacredBlue,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
             ),
-            child: const Text('Edit Profile'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAccountSection(BuildContext context) {
+  Widget _buildAccountSection(BuildContext context, user, AuthProvider authProvider) {
     return _buildSection(
       'ACCOUNT',
       [
         MenuItem(
           icon: Icons.person_outline,
           title: 'Personal Information',
-          onTap: () => _showComingSoon(context),
+          subtitle: '${user.fullName} • ${user.email}',
+          onTap: () => _showEditProfileDialog(context, authProvider),
         ),
         MenuItem(
           icon: Icons.location_on_outlined,
@@ -155,14 +333,17 @@ class ProfileScreen extends StatelessWidget {
         MenuItem(
           icon: Icons.favorite_border,
           title: 'Wishlist',
-          onTap: () {
-            Navigator.pushNamed(context, '/wishlist');
-          },
+          onTap: () => _showComingSoon(context),
         ),
         MenuItem(
           icon: Icons.notifications_outlined,
           title: 'Notification Preferences',
-          onTap: () => _showComingSoon(context),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationPreferencesScreen()),
+            );
+          },
           showDivider: false,
         ),
       ],
@@ -174,23 +355,18 @@ class ProfileScreen extends StatelessWidget {
       'ORDERS',
       [
         MenuItem(
-          icon: Icons.event_note,
-          title: 'My Orders',
-          onTap: () => _showComingSoon(context),
-        ),
-        MenuItem(
-          icon: Icons.local_shipping_outlined,
-          title: 'Aashirwad Box Tracking',
-          onTap: () => _showComingSoon(context),
-        ),
-        MenuItem(
           icon: Icons.history,
           title: 'Order History',
           onTap: () => _showComingSoon(context),
         ),
         MenuItem(
-          icon: Icons.receipt_outlined,
-          title: 'Download Invoices',
+          icon: Icons.local_shipping_outlined,
+          title: 'Track Orders',
+          onTap: () => _showComingSoon(context),
+        ),
+        MenuItem(
+          icon: Icons.receipt_long_outlined,
+          title: 'Invoices',
           onTap: () => _showComingSoon(context),
           showDivider: false,
         ),
@@ -300,14 +476,14 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsSection(BuildContext context) {
+  Widget _buildSettingsSection(BuildContext context, user) {
     return _buildSection(
       'SETTINGS',
       [
         MenuItem(
           icon: Icons.language_outlined,
           title: 'Language',
-          subtitle: 'English',
+          subtitle: user.language?.toUpperCase() ?? 'ENGLISH',
           onTap: () => _showLanguageDialog(context),
         ),
         MenuItem(
@@ -341,61 +517,100 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAccountActions(BuildContext context, UserProvider userProvider) {
+  Widget _buildAccountActions(BuildContext context, AuthProvider authProvider) {
     return _buildSection(
       'ACCOUNT ACTIONS',
       [
         MenuItem(
-          icon: Icons.lock_outline,
-          title: 'Change Password',
-          onTap: () => _showComingSoon(context),
-        ),
-        MenuItem(
-          icon: Icons.privacy_tip_outlined,
-          title: 'Privacy Policy',
-          onTap: () => _showComingSoon(context),
-        ),
-        MenuItem(
-          icon: Icons.description_outlined,
-          title: 'Terms & Conditions',
-          onTap: () => _showComingSoon(context),
-        ),
-        MenuItem(
-          icon: Icons.delete_outline,
-          title: 'Delete Account',
-          onTap: () => _showDeleteAccountDialog(context),
-        ),
-        MenuItem(
-          icon: Icons.logout,
+          icon: Icons.logout_outlined,
           title: 'Logout',
-          onTap: () => _showLogoutDialog(context, userProvider),
+          onTap: () => _showLogoutDialog(context, authProvider),
           showDivider: false,
         ),
       ],
     );
   }
 
-  Widget _buildSection(String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-              letterSpacing: 0.5,
-            ),
+
+
+  void _showEditProfileDialog(BuildContext context, AuthProvider authProvider) {
+    final user = authProvider.user!;
+    final nameController = TextEditingController(text: user.fullName);
+    final phoneController = TextEditingController(text: user.phone ?? '');
+    final languageController = TextEditingController(text: user.language ?? 'english');
+    final templeController = TextEditingController(text: user.preferredTemple ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Profile'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Full Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: languageController,
+                decoration: const InputDecoration(
+                  labelText: 'Language',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: templeController,
+                decoration: const InputDecoration(
+                  labelText: 'Preferred Temple',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
         ),
-        Container(
-          color: Colors.white,
-          child: Column(children: items),
-        ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await authProvider.updateProfile(
+                fullName: nameController.text.trim(),
+                phone: phoneController.text.trim(),
+                language: languageController.text.trim(),
+                preferredTemple: templeController.text.trim(),
+              );
+              
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Profile updated successfully')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.sacredBlue,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -436,7 +651,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context, UserProvider userProvider) {
+  void _showLogoutDialog(BuildContext context, AuthProvider authProvider) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -449,9 +664,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              final authProvider = Provider.of<AuthProvider>(context, listen: false);
               await authProvider.logout();
-              userProvider.logout();
               
               if (context.mounted) {
                 Navigator.pop(context);

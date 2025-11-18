@@ -24,14 +24,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.templeBrown),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      backgroundColor: const Color(0xFF2C2C2C),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -40,33 +33,36 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(
-                  Icons.lock_reset,
-                  size: 80,
-                  color: AppTheme.sacredBlue,
-                ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 60),
+                _buildLogo(),
+                const SizedBox(height: 40),
                 const Text(
-                  'Reset Password',
+                  'Forgot Your\nPassword?',
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: AppTheme.templeBrown,
+                    color: Colors.white,
+                    height: 1.2,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 const Text(
-                  'Enter your email to receive password reset link',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  'No problem. Enter the email address or\nphone number associated with your account\nand we\'ll send you a link to reset your\npassword.',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white70,
+                    height: 1.5,
+                  ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 48),
                 _buildEmailField(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 _buildSendButton(),
                 const Spacer(),
                 _buildBackToLogin(),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -75,29 +71,83 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildEmailField() {
-    return TextFormField(
-      controller: _emailController,
-      keyboardType: TextInputType.emailAddress,
-      decoration: InputDecoration(
-        labelText: 'Email',
-        hintText: 'Enter your registered email',
-        prefixIcon: const Icon(Icons.email_outlined, color: AppTheme.sacredBlue),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        focusedBorder: OutlineInputBorder(
+  Widget _buildLogo() {
+    return Center(
+      child: Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppTheme.sacredBlue, width: 2),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.mosque_outlined,
+              size: 50,
+              color: Color(0xFF2C2C2C),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'MANDIR MITRA',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[700],
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
         ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter your email';
-        }
-        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-          return 'Please enter a valid email';
-        }
-        return null;
-      },
+    );
+  }
+
+  Widget _buildEmailField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Email or Phone Number',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Enter your email or phone number',
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+            filled: true,
+            fillColor: Colors.transparent,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFFF8C42), width: 2),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFFF8C42), width: 2),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFFF8C42), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your email or phone number';
+            }
+            return null;
+          },
+        ),
+      ],
     );
   }
 
@@ -107,12 +157,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         return ElevatedButton(
           onPressed: authProvider.isLoading ? null : _handleSendLink,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.divineGold,
+            backgroundColor: const Color(0xFFFF8C42),
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: const EdgeInsets.symmetric(vertical: 18),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(28),
             ),
+            elevation: 0,
           ),
           child: authProvider.isLoading
               ? const SizedBox(
@@ -124,8 +175,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 )
               : const Text(
-                  'Send Reset Link',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  'Send Instructions',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
         );
       },
@@ -133,14 +184,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Widget _buildBackToLogin() {
-    return TextButton(
-      onPressed: () => Navigator.pop(context),
-      child: const Text(
-        'Back to Login',
-        style: TextStyle(
-          color: AppTheme.sacredBlue,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
+    return Center(
+      child: TextButton.icon(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(
+          Icons.arrow_back,
+          color: Color(0xFFFF8C42),
+          size: 20,
+        ),
+        label: const Text(
+          'Back to Login',
+          style: TextStyle(
+            color: Color(0xFFFF8C42),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -149,7 +207,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _handleSendLink() async {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final success = await authProvider.sendPasswordResetLink(
+      final success = await authProvider.resetPassword(
         _emailController.text.trim(),
       );
 

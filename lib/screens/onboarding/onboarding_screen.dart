@@ -18,25 +18,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      icon: Icons.temple_hindu,
-      title: 'Authentic Spiritual Rituals',
-      description:
-          'Experience traditional Vedic rituals performed by certified priests at renowned temples across India',
-      color: AppTheme.sacredBlue,
+      icon: Icons.volunteer_activism_outlined,
+      title: 'Offer Chadhava Remotely',
+      description: 'Make offerings to temples from anywhere.',
     ),
     OnboardingPage(
-      icon: Icons.videocam,
-      title: 'Live Streaming & Personal Touch',
-      description:
-          'Watch your ritual live in real-time and feel connected with divine blessings from anywhere in the world',
-      color: AppTheme.divineGold,
+      icon: Icons.temple_hindu_outlined,
+      title: 'Explore Divine Temples',
+      description: 'Discover temples, their history, and timings.',
     ),
     OnboardingPage(
-      icon: Icons.card_giftcard,
-      title: 'Aashirwad Box Delivered',
-      description:
-          'Receive blessed prasad and sacred items from your ritual delivered right to your doorstep',
-      color: AppTheme.templeBrown,
+      icon: Icons.self_improvement_outlined,
+      title: 'Personal Rituals',
+      description: 'Perform daily pujas, aartis, and set reminders from home.',
+      secondaryIcon: Icons.temple_hindu_outlined,
+      secondaryTitle: 'Public Rituals',
+      secondaryDescription: 'Book pujas at temples and participate in community events.',
     ),
   ];
 
@@ -49,6 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F1E8),
       body: SafeArea(
         child: Column(
           children: [
@@ -87,9 +85,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: const Text(
             'Skip',
             style: TextStyle(
-              color: AppTheme.sacredBlue,
+              color: Color(0xFF6B7280),
               fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -98,43 +96,216 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildPage(OnboardingPage page) {
+    if (_currentPage == 0) {
+      return _buildWelcomePage();
+    } else if (_currentPage == 2) {
+      return _buildDualCardPage(page);
+    }
+    return _buildFeatureCard(page);
+  }
+
+  Widget _buildWelcomePage() {
     return Padding(
-      padding: const EdgeInsets.all(40),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const Spacer(),
+          _buildFeatureCard(_pages[0]),
+          const SizedBox(height: 24),
+          _buildFeatureCard(_pages[1]),
+          const Spacer(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureCard(OnboardingPage page) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
           Container(
-            width: 200,
-            height: 200,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              color: page.color.withOpacity(0.1),
-              shape: BoxShape.circle,
+              color: const Color(0xFFFFE5D0),
+              borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(
               page.icon,
-              size: 100,
-              color: page.color,
+              size: 32,
+              color: const Color(0xFFFF8C42),
             ),
           ),
-          const SizedBox(height: 48),
-          Text(
-            page.title,
-            style: const TextStyle(
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  page.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  page.description,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF6B7280),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDualCardPage(OnboardingPage page) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'Welcome to Mandir Mitra',
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppTheme.templeBrown,
+              color: Color(0xFF2D3748),
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          Text(
-            page.description,
-            style: const TextStyle(
+          const SizedBox(height: 8),
+          const Text(
+            'Your Path to Daily Devotion',
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.grey,
-              height: 1.5,
+              color: Color(0xFF6B7280),
             ),
             textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 40),
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE5D0),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    page.icon,
+                    size: 40,
+                    color: const Color(0xFFFF8C42),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  page.title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  page.description,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF6B7280),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE5D0),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    page.secondaryIcon ?? Icons.temple_hindu_outlined,
+                    size: 40,
+                    color: const Color(0xFFFF8C42),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  page.secondaryTitle ?? '',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  page.secondaryDescription ?? '',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF6B7280),
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -152,8 +323,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           height: 8,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? AppTheme.sacredBlue
-                : Colors.grey[300],
+                ? const Color(0xFFFF8C42)
+                : const Color(0xFFFFE5D0),
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -165,21 +336,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isLastPage = _currentPage == _pages.length - 1;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: ElevatedButton(
         onPressed: isLastPage ? _handleGetStarted : _handleNext,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.divineGold,
+          backgroundColor: const Color(0xFFFF8C42),
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 18),
           minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(28),
           ),
+          elevation: 0,
         ),
         child: Text(
           isLastPage ? 'Get Started' : 'Next',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -221,12 +393,16 @@ class OnboardingPage {
   final IconData icon;
   final String title;
   final String description;
-  final Color color;
+  final IconData? secondaryIcon;
+  final String? secondaryTitle;
+  final String? secondaryDescription;
 
   OnboardingPage({
     required this.icon,
     required this.title,
     required this.description,
-    required this.color,
+    this.secondaryIcon,
+    this.secondaryTitle,
+    this.secondaryDescription,
   });
 }

@@ -1,187 +1,271 @@
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
+import '../config/supabase_config.dart';
 import '../models/user.dart';
 
 class AuthProvider with ChangeNotifier {
-  bool _isLoggedIn = false;
   User? _user;
-  String? _token;
   bool _isLoading = false;
+  String? _errorMessage;
 
-  bool get isLoggedIn => _isLoggedIn;
   User? get user => _user;
-  String? get token => _token;
   bool get isLoading => _isLoading;
+  bool get isAuthenticated => _user != null;
+  String? get errorMessage => _errorMessage;
 
   AuthProvider() {
-    _checkLoginStatus();
+    _initializeAuthListener();
   }
 
-  Future<void> _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-    if (_isLoggedIn) {
-      _token = prefs.getString('token');
-      _user = User(
-        id: prefs.getString('userId') ?? '',
-        name: prefs.getString('userName') ?? '',
-        email: prefs.getString('userEmail') ?? '',
-        phone: prefs.getString('userPhone') ?? '',
-        profilePhoto: prefs.getString('userPhoto'),
-        isPhoneVerified: prefs.getBool('isPhoneVerified') ?? false,
-        isEmailVerified: prefs.getBool('isEmailVerified') ?? true,
-      );
-    }
-    notifyListeners();
-  }
-
-  Future<bool> login(String emailOrPhone, String password) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (emailOrPhone == 'test@test.com' && password == '123456') {
-      _isLoggedIn = true;
-      _token = 'mock_token_${DateTime.now().millisecondsSinceEpoch}';
-      _user = User(
-        id: 'USER001',
-        name: 'Rajesh Kumar',
-        email: 'test@test.com',
-        phone: '+91 98765 43210',
-        profilePhoto: 'https://i.pravatar.cc/300?img=33',
-        isPhoneVerified: true,
-        isEmailVerified: true,
-      );
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('token', _token!);
-      await prefs.setString('userId', _user!.id);
-      await prefs.setString('userName', _user!.name);
-      await prefs.setString('userEmail', _user!.email);
-      await prefs.setString('userPhone', _user!.phone);
-      await prefs.setString('userPhoto', _user!.profilePhoto ?? '');
-      await prefs.setBool('isPhoneVerified', _user!.isPhoneVerified);
-      await prefs.setBool('isEmailVerified', _user!.isEmailVerified);
-
-      _isLoading = false;
-      notifyListeners();
-      return true;
-    }
-
-    _isLoading = false;
-    notifyListeners();
-    return false;
-  }
-
-  Future<bool> signup({
-    required String name,
-    required String email,
-    required String phone,
-    required String password,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    _user = User(
-      id: 'USER_${DateTime.now().millisecondsSinceEpoch}',
-      name: name,
-      email: email,
-      phone: phone,
-      isPhoneVerified: false,
-      isEmailVerified: false,
-    );
-
-    _isLoading = false;
-    notifyListeners();
-    return true;
-  }
-
-  Future<bool> verifyOTP(String otp) async {
-    _isLoading = true;
-    notifyListeners();
-
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (otp == '123456') {
-      _isLoggedIn = true;
-      _token = 'mock_token_${DateTime.now().millisecondsSinceEpoch}';
-      
-      if (_user != null) {
-        _user = User(
-          id: _user!.id,
-          name: _user!.name,
-          email: _user!.email,
-          phone: _user!.phone,
-          profilePhoto: _user!.profilePhoto,
-          isPhoneVerified: true,
-          isEmailVerified: true,
-        );
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('token', _token!);
-        await prefs.setString('userId', _user!.id);
-        await prefs.setString('userName', _user!.name);
-        await prefs.setString('userEmail', _user!.email);
-        await prefs.setString('userPhone', _user!.phone);
-        await prefs.setBool('isPhoneVerified', true);
-        await prefs.setBool('isEmailVerified', true);
+  void _initializeAuthListener() {
+    supabase.Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final supabase.AuthState authState = data;
+      if (authState.session != null) {
+        final supabase.User? supabaseUser = authState.session!.user;
+        _loadUserProfile(supabaseUser!);
+      } else {
+        _user = null;
+        notifyListeners();
       }
+    });
+  }
 
+  Future<void> _loadUserProfile(supabase.User supabaseUser) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await supabase.Supabase.instance.client
+          .from('users')
+          .select()
+          .eq('id', supabaseUser.id)
+          .single();
+
+      _user = User.fromSupabaseUser(supabaseUser, response);
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = 'Failed to load user profile: $e';
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return true;
     }
-
-    _isLoading = false;
-    notifyListeners();
-    return false;
   }
 
-  Future<bool> sendPasswordResetLink(String email) async {
-    _isLoading = true;
-    notifyListeners();
+  Future<bool> login(String email, String password) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 2));
+      final response = await supabase.Supabase.instance.client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
 
-    _isLoading = false;
-    notifyListeners();
-    return true;
+      if (response.user != null) {
+        await _loadUserProfile(response.user!);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _errorMessage = 'Login failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  Future<bool> resetPassword(String newPassword) async {
-    _isLoading = true;
-    notifyListeners();
+  Future<bool> signup(String fullName, String email, String phone, String password) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 2));
+      print('🔐 Starting signup for: $email');
 
-    _isLoading = false;
-    notifyListeners();
-    return true;
+      final response = await supabase.Supabase.instance.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      print('✅ Auth signup response: ${response.user?.id}');
+
+      if (response.user != null) {
+        // Create user profile
+        print('📝 Creating user profile in users table...');
+        
+        try {
+          // Use RPC function to bypass RLS during signup
+          await supabase.Supabase.instance.client.rpc('create_user_profile', params: {
+            'user_id': response.user!.id,
+            'user_email': email,
+            'user_full_name': fullName,
+            'user_phone': phone,
+          });
+          
+          print('✅ User profile created successfully!');
+        } catch (profileError) {
+          print('❌ Error creating user profile: $profileError');
+          _errorMessage = 'Profile creation failed: $profileError';
+          // Still return true as auth user was created
+        }
+        
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('❌ Signup error: $e');
+      _errorMessage = 'Signup failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> verifyOTP(String phone, String otp) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      final response = await supabase.Supabase.instance.client.auth.verifyOTP(
+        email: phone, // phone parameter contains email
+        token: otp,
+        type: supabase.OtpType.signup,
+      );
+
+      if (response.user != null) {
+        await _loadUserProfile(response.user!);
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _errorMessage = 'OTP verification failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> resetPassword(String email) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      await supabase.Supabase.instance.client.auth.resetPasswordForEmail(email);
+      return true;
+    } catch (e) {
+      _errorMessage = 'Password reset failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updatePassword(String newPassword) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      await supabase.Supabase.instance.client.auth.updateUser(
+        supabase.UserAttributes(password: newPassword),
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = 'Password update failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> logout() async {
-    _isLoggedIn = false;
-    _user = null;
-    _token = null;
+    try {
+      await supabase.Supabase.instance.client.auth.signOut();
+      _user = null;
+      _errorMessage = null;
+    } catch (e) {
+      _errorMessage = 'Logout failed: $e';
+    } finally {
+      notifyListeners();
+    }
+  }
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+  Future<bool> updateProfile({
+    String? fullName,
+    String? phone,
+    String? language,
+    String? preferredTemple,
+  }) async {
+    if (_user == null) return false;
 
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      final updates = <String, dynamic>{};
+      if (fullName != null) updates['full_name'] = fullName;
+      if (phone != null) updates['phone'] = phone;
+      if (language != null) updates['language'] = language;
+      if (preferredTemple != null) updates['preferred_temple'] = preferredTemple;
+      updates['updated_at'] = DateTime.now().toIso8601String();
+
+      await supabase.Supabase.instance.client
+          .from('users')
+          .update(updates)
+          .eq('id', _user!.id);
+
+      // Reload user profile
+      await _loadUserProfile(supabase.Supabase.instance.client.auth.currentUser!);
+      return true;
+    } catch (e) {
+      _errorMessage = 'Profile update failed: $e';
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    _errorMessage = null;
     notifyListeners();
   }
 
+  String _getErrorMessage(dynamic error) {
+    if (error is supabase.AuthException) {
+      switch (error.message) {
+        case 'Invalid login credentials':
+          return 'Invalid email or password';
+        case 'User not found':
+          return 'No account found with this email';
+        case 'Email already registered':
+          return 'An account with this email already exists';
+        case 'Phone already registered':
+          return 'An account with this phone number already exists';
+        case 'Weak password':
+          return 'Password is too weak. Please choose a stronger password';
+        default:
+          return error.message;
+      }
+    }
+    return 'An unexpected error occurred';
+  }
+
   Future<void> skipOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboardingComplete', true);
+    // This can be implemented using SharedPreferences if needed
   }
 
   Future<bool> hasCompletedOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('onboardingComplete') ?? false;
+    // This can be implemented using SharedPreferences if needed
+    return true;
   }
 }

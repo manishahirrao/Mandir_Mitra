@@ -13,163 +13,111 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: AppTheme.sacredBlue,
-        foregroundColor: Colors.white,
-      ),
+      backgroundColor: const Color(0xFF1A1A1A),
       body: Consumer<SettingsProvider>(
         builder: (context, provider, child) {
           return ListView(
+            padding: const EdgeInsets.all(16),
             children: [
-              SettingsSection(
-                title: 'APP PREFERENCES',
-                children: [
-                  SettingsTile(
-                    icon: Icons.language,
-                    title: 'Language',
-                    subtitle: provider.settings.getLanguageName(),
-                    onTap: () => _showLanguageSelector(context, provider),
-                  ),
-                  SettingsTile(
-                    icon: Icons.palette,
-                    title: 'Appearance',
-                    subtitle: _getThemeName(provider.settings.themeMode),
-                    onTap: () => _showThemeSelector(context, provider),
-                  ),
-                  SettingsTile(
-                    icon: Icons.text_fields,
-                    title: 'Text Size',
-                    subtitle: provider.settings.getFontSizeName(),
-                    onTap: () => _showFontSizeSelector(context, provider),
-                  ),
-                ],
-              ),
-              SettingsSection(
-                title: 'NOTIFICATIONS',
-                children: [
-                  SettingsTile(
-                    icon: Icons.notifications,
-                    title: 'Enable Notifications',
-                    trailing: Switch(
-                      value: provider.settings.notificationsEnabled,
-                      onChanged: (value) => provider.toggleNotifications(value),
-                      activeColor: AppTheme.sacredBlue,
-                    ),
-                  ),
-                  SettingsTile(
-                    icon: Icons.volume_up,
-                    title: 'Sound',
-                    trailing: Switch(
-                      value: provider.settings.soundEnabled,
-                      onChanged: (value) => provider.toggleSound(value),
-                      activeColor: AppTheme.sacredBlue,
-                    ),
-                  ),
-                  SettingsTile(
-                    icon: Icons.vibration,
-                    title: 'Vibration',
-                    trailing: Switch(
-                      value: provider.settings.vibrationEnabled,
-                      onChanged: (value) => provider.toggleVibration(value),
-                      activeColor: AppTheme.sacredBlue,
-                    ),
-                  ),
-                ],
-              ),
-              SettingsSection(
-                title: 'PRIVACY & SECURITY',
-                children: [
-                  SettingsTile(
-                    icon: Icons.fingerprint,
-                    title: 'Biometric Login',
-                    trailing: Switch(
-                      value: provider.settings.biometricEnabled,
-                      onChanged: (value) => provider.setBiometric(value),
-                      activeColor: AppTheme.sacredBlue,
-                    ),
-                  ),
-                  SettingsTile(
-                    icon: Icons.lock,
-                    title: 'Privacy Policy',
-                    onTap: () {},
-                  ),
-                  SettingsTile(
-                    icon: Icons.description,
-                    title: 'Terms & Conditions',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-              SettingsSection(
-                title: 'CACHE & STORAGE',
-                children: [
-                  SettingsTile(
-                    icon: Icons.storage,
-                    title: 'Storage',
-                    subtitle: provider.getStorageInfo().totalSizeFormatted,
-                    onTap: () => _showStorageInfo(context, provider),
-                  ),
-                  SettingsTile(
-                    icon: Icons.delete_sweep,
-                    title: 'Clear Cache',
-                    onTap: () => _clearCache(context, provider),
-                  ),
-                ],
-              ),
-              SettingsSection(
-                title: 'ABOUT',
-                children: [
-                  SettingsTile(
-                    icon: Icons.info,
-                    title: 'App Version',
-                    subtitle: '1.0.0 (Build 23)',
-                    onTap: () => provider.incrementVersionTap(),
-                  ),
-                  SettingsTile(
-                    icon: Icons.star,
-                    title: 'Rate Us',
-                    onTap: () {},
-                  ),
-                  SettingsTile(
-                    icon: Icons.share,
-                    title: 'Share App',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-              if (provider.isDeveloperMode)
-                SettingsSection(
-                  title: 'DEVELOPER MODE',
-                  children: [
-                    SettingsTile(
-                      icon: Icons.bug_report,
-                      title: 'Beta Features',
-                      trailing: Switch(
-                        value: provider.settings.betaFeaturesEnabled,
-                        onChanged: (value) => provider.toggleBetaFeatures(value),
-                        activeColor: AppTheme.sacredBlue,
-                      ),
-                    ),
-                    SettingsTile(
-                      icon: Icons.code,
-                      title: 'Debug Mode',
-                      subtitle: 'Developer options enabled',
-                    ),
-                  ],
+              const Text(
+                'Account Settings',
+                style: TextStyle(
+                  color: Color(0xFFFF8C42),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
+              const SizedBox(height: 12),
+              _buildSettingTile(
+                icon: Icons.person_outline,
+                title: 'Edit Profile',
+                subtitle: 'Personal information, photo',
+                onTap: () {},
+              ),
+              _buildSettingTile(
+                icon: Icons.lock_outline,
+                title: 'Change Password',
+                onTap: () {},
+              ),
+              _buildSettingTile(
+                icon: Icons.link,
+                title: 'Linked Accounts',
+                onTap: () {},
+              ),
               const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ElevatedButton(
+              const Text(
+                'App Preferences',
+                style: TextStyle(
+                  color: Color(0xFFFF8C42),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildSettingTileWithToggle(
+                icon: Icons.notifications_outlined,
+                title: 'Notifications',
+                value: provider.settings.notificationsEnabled,
+                onChanged: (value) => provider.toggleNotifications(value),
+              ),
+              _buildSettingTile(
+                icon: Icons.language,
+                title: 'Language',
+                subtitle: 'English',
+                onTap: () => _showLanguageSelector(context, provider),
+              ),
+              _buildSettingTileWithToggle(
+                icon: Icons.dark_mode_outlined,
+                title: 'Dark Theme',
+                value: true,
+                onChanged: (value) {},
+              ),
+              _buildSettingTile(
+                icon: Icons.security,
+                title: 'Privacy & Security',
+                onTap: () {},
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Help & Support',
+                style: TextStyle(
+                  color: Color(0xFFFF8C42),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildSettingTile(
+                icon: Icons.help_outline,
+                title: 'FAQ',
+                onTap: () {},
+              ),
+              _buildSettingTile(
+                icon: Icons.headset_mic_outlined,
+                title: 'Contact Us',
+                onTap: () {},
+              ),
+              const SizedBox(height: 32),
+              Center(
+                child: TextButton(
                   onPressed: () => _logout(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.errorRed,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
                   child: const Text(
-                    'Logout',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    'Log Out',
+                    style: TextStyle(
+                      color: Color(0xFFFF4444),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Center(
+                child: Text(
+                  'App Version 1.0.0',
+                  style: TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -181,14 +129,93 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSettingTile({
+    required IconData icon,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF3A2A1A),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: const Color(0xFFFF8C42), size: 20),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: const TextStyle(
+                  color: Color(0xFF9CA3AF),
+                  fontSize: 13,
+                ),
+              )
+            : null,
+        trailing: const Icon(Icons.chevron_right, color: Color(0xFF6B7280)),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildSettingTileWithToggle({
+    required IconData icon,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF3A2A1A),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: const Color(0xFFFF8C42), size: 20),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        trailing: Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: const Color(0xFFFF8C42),
+          activeTrackColor: const Color(0xFFFF8C42).withOpacity(0.5),
+        ),
+      ),
+    );
+  }
+
   String _getThemeName(AppThemeMode mode) {
     switch (mode) {
       case AppThemeMode.light:
         return 'Light';
-      case AppThemeMode.dark:
-        return 'Dark';
-      case AppThemeMode.system:
-        return 'System Default';
     }
   }
 

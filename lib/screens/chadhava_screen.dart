@@ -38,11 +38,7 @@ class _ChadhavaScreenState extends State<ChadhavaScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: Consumer<ChadhavaProvider>(
+        child: Consumer<ChadhavaProvider>(
                 builder: (context, provider, child) {
                   if (provider.isLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -150,80 +146,6 @@ class _ChadhavaScreenState extends State<ChadhavaScreen> {
                   );
                 },
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Offer Chadhava',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Present offerings to your beloved deities',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search chadhava...',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchQuery.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() => _searchQuery = '');
-                      },
-                    )
-                  : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: AppTheme.primaryOrange),
-              ),
-              filled: true,
-              fillColor: Colors.grey[50],
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            ),
-            onChanged: (value) {
-              setState(() => _searchQuery = value);
-            },
-          ),
-        ],
       ),
     );
   }

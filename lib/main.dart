@@ -70,7 +70,14 @@ class MandirMitraApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, UserProvider>(
           create: (context) => UserProvider(),
-          update: (context, auth, previous) => previous ?? UserProvider(),
+          update: (context, auth, previous) {
+            final userProvider = previous ?? UserProvider();
+            // Load user profile when auth state changes
+            if (auth.isAuthenticated && auth.user != null) {
+              userProvider.loadUserProfile(auth.user!.id);
+            }
+            return userProvider;
+          },
         ),
         
         // Sync Provider

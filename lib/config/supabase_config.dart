@@ -2,8 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseConfig {
   // TODO: Replace with your actual Supabase credentials
-  static const String supabaseUrl = 'YOUR_SUPABASE_URL';
-  static const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+  static const String supabaseUrl = 'https://widjqzuxwueorlufjnpj.supabase.co';
+  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndpZGpxenV4d3Vlb3JsdWZqbnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMyMjIxMzAsImV4cCI6MjA3ODc5ODEzMH0.ZXIYHgoOpaW_zQk50zO-EjF0AsTkZ4fJQVA8kw-_uEk';
 
   static SupabaseClient get client => Supabase.instance.client;
 
@@ -32,9 +32,7 @@ class SupabaseConfig {
   static const String faqsTable = 'faqs';
   static const String templesTable = 'temples';
 
-  // Storage buckets
-  static const String profileImagesBucket = 'profile-images';
-  static const String ritualImagesBucket = 'ritual-images';
-  static const String reviewImagesBucket = 'review-images';
-  static const String invoicesBucket = 'invoices';
+  // Storage buckets (NOT USED - Using Cloudinary instead)
+  // All images and videos are stored in Cloudinary
+  // Cloudinary provides better optimization, CDN, and transformations
 }

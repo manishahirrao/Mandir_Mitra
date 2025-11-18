@@ -78,7 +78,7 @@ class _OTPScreenState extends State<OTPScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                'Verify Phone Number',
+                'Verify Email Address',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -87,8 +87,9 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter the 6-digit code sent to\n${widget.phoneNumber}',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                'Enter the verification code sent to your email',
+                style: const TextStyle(fontSize: 16, color: AppTheme.textSecondary),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
               _buildOTPFields(),
@@ -248,7 +249,7 @@ class _OTPScreenState extends State<OTPScreen> {
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final success = await authProvider.verifyOTP(otp);
+    final success = await authProvider.verifyOTP(widget.phoneNumber, otp);
 
     if (success && mounted) {
       Navigator.pushAndRemoveUntil(

@@ -26,7 +26,7 @@ class _TempleDetailScreenState extends State<TempleDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFF1A1A1A),
       body: CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -51,28 +51,32 @@ class _TempleDetailScreenState extends State<TempleDetailScreen> {
     return SliverAppBar(
       expandedHeight: 300,
       pinned: true,
-      backgroundColor: AppTheme.primaryOrange,
+      backgroundColor: const Color(0xFF1A1A1A),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () => Navigator.pop(context),
+      ),
       flexibleSpace: FlexibleSpaceBar(
-        background: TempleImageCarousel(images: widget.temple.images),
+        background: Stack(
+          fit: StackFit.expand,
+          children: [
+            TempleImageCarousel(images: widget.temple.images),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       actions: [
-        IconButton(
-          icon: Icon(
-            _isFavorite ? Icons.favorite : Icons.favorite_border,
-            color: _isFavorite ? Colors.red : Colors.white,
-          ),
-          onPressed: () {
-            setState(() => _isFavorite = !_isFavorite);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  _isFavorite ? 'Added to favorites' : 'Removed from favorites',
-                ),
-                duration: const Duration(seconds: 1),
-              ),
-            );
-          },
-        ),
         IconButton(
           icon: const Icon(Icons.share, color: Colors.white),
           onPressed: () {
@@ -88,107 +92,56 @@ class _TempleDetailScreenState extends State<TempleDetailScreen> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(20),
-      color: Colors.white,
+      color: const Color(0xFF1A1A1A),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             widget.temple.name,
             style: const TextStyle(
-              fontSize: 26,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
-              fontFamily: 'PlayfairDisplay',
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.location_on, color: AppTheme.primaryOrange, size: 20),
-              const SizedBox(width: 8),
+              const Icon(Icons.location_on_outlined, color: Colors.white70, size: 18),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   widget.temple.fullLocation,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey[700],
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
+              const SizedBox(width: 16),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.amber[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber[200]!),
+                  color: Colors.amber.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.star, color: Colors.amber, size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${widget.temple.rating}',
-                      style: const TextStyle(
-                        fontSize: 16,
+                    const Text(
+                      '4.9',
+                      style: TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
+                        color: Colors.amber,
                       ),
                     ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.star, color: Colors.amber, size: 14),
                   ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '${widget.temple.reviewCount} reviews',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
                 ),
               ),
             ],
           ),
-          if (widget.temple.presidingDeity != null) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.primaryOrange.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Text('🙏', style: TextStyle(fontSize: 24)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Presiding Deity',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          widget.temple.presidingDeity!,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryOrange,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );

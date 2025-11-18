@@ -92,7 +92,7 @@ class _WishlistButtonState extends State<WishlistButton>
     AuthProvider authProvider,
   ) async {
     // Check if user is logged in
-    if (!authProvider.isLoggedIn) {
+    if (!authProvider.isAuthenticated) {
       _showLoginDialog();
       return;
     }

@@ -8,159 +8,196 @@ class ServicesScreen extends StatefulWidget {
   State<ServicesScreen> createState() => _ServicesScreenState();
 }
 
-class _ServicesScreenState extends State<ServicesScreen> {
-  String selectedFilter = 'All';
+class _ServicesScreenState extends State<ServicesScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  String selectedFilter = 'Trending';
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildSearchHeader(),
-          _buildFilterChips(),
-          _buildFeaturedBanner(),
-          _buildEverydayRituals(),
-          _buildLifeBenefitPujas(),
-          _buildDoshNivaran(),
-          _buildSpecialOccasions(),
+      backgroundColor: const Color(0xFFFFF8F0),
+      body: Column(
+        children: [
+          _buildTabBar(),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildGroupRitualsTab(),
+                _buildPersonalRitualsTab(),
+                _buildAstrologyTab(),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchHeader() {
-    return SliverToBoxAdapter(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Public Rituals',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.sacredGrey,
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search for rituals, deities...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.filter_list),
-                  onPressed: () => _showFilterDrawer(),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-              ),
-            ),
-          ],
-        ),
+  Widget _buildTabBar() {
+    return Container(
+      color: const Color(0xFFFFF8F0),
+      child: TabBar(
+        controller: _tabController,
+        labelColor: const Color(0xFFFF8C42),
+        unselectedLabelColor: const Color(0xFF6B7280),
+        indicatorColor: const Color(0xFFFF8C42),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        tabs: const [
+          Tab(text: 'Group Rituals'),
+          Tab(text: 'Personal'),
+          Tab(text: 'Astrology'),
+        ],
       ),
     );
   }
 
+  Widget _buildGroupRitualsTab() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildFilterChips(),
+          _buildFeaturedBanner(),
+          _buildEverydayRituals(),
+          _buildLifeBenefitPujas(),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersonalRitualsTab() {
+    return const Center(child: Text('Personal Rituals Coming Soon'));
+  }
+
+  Widget _buildAstrologyTab() {
+    return const Center(child: Text('Astrology Services Coming Soon'));
+  }
+
   Widget _buildFilterChips() {
-    final filters = ['All', 'Everyday', 'Life Benefits', 'Dosh Removal', 'Special', 'This Week', 'Premium'];
+    final filters = ['Trending', 'Most Popular', 'Upcoming'];
     
-    return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 50,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          itemCount: filters.length,
-          itemBuilder: (context, index) {
-            final filter = filters[index];
-            final isSelected = selectedFilter == filter;
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                label: Text(filter),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() => selectedFilter = filter);
-                },
-                selectedColor: AppTheme.goldenAccent,
-                backgroundColor: Colors.white,
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.white : AppTheme.sacredGrey,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: filters.length,
+        itemBuilder: (context, index) {
+          final filter = filters[index];
+          final isSelected = selectedFilter == filter;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ChoiceChip(
+              label: Text(filter),
+              selected: isSelected,
+              onSelected: (selected) {
+                setState(() => selectedFilter = filter);
+              },
+              selectedColor: const Color(0xFFFFE500),
+              backgroundColor: Colors.white,
+              labelStyle: TextStyle(
+                color: isSelected ? const Color(0xFF2D3748) : const Color(0xFF6B7280),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                fontSize: 13,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected ? const Color(0xFFFFE500) : const Color(0xFFE5E7EB),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
   Widget _buildFeaturedBanner() {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: AppTheme.sacredGradient,
-          borderRadius: BorderRadius.circular(16),
+    return Container(
+      margin: const EdgeInsets.all(20),
+      height: 200,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        image: const DecorationImage(
+          image: NetworkImage('https://images.unsplash.com/photo-1604608672516-f1b9b1b1c1c1'),
+          fit: BoxFit.cover,
         ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black.withOpacity(0.3),
+              Colors.black.withOpacity(0.7),
+            ],
+          ),
+        ),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             const Text(
-              '11,000 Santan Gopal Mantra Jaap',
+              'Special Navratri Puja',
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
             const SizedBox(height: 8),
             const Text(
-              'Maha Havan - Special Event',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              'Join our community for a special all-day ceremony to honor Goddess Durga',
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white70,
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
+                _buildCountdownItem('02', 'DAYS'),
+                const SizedBox(width: 16),
+                _buildCountdownItem('18', 'HOURS'),
+                const SizedBox(width: 16),
+                _buildCountdownItem('45', 'MINS'),
+                const SizedBox(width: 16),
+                _buildCountdownItem('12', 'SECS'),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFE500),
+                    foregroundColor: const Color(0xFF2D3748),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: const Text(
-                    '⏰ 2 days left',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    '👥 45/100 slots',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                    'Book Now',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.goldenAccent,
-                foregroundColor: AppTheme.sacredGrey,
-              ),
-              child: const Text('Book Now'),
             ),
           ],
         ),
@@ -168,67 +205,148 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
+  Widget _buildCountdownItem(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            color: Colors.white70,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildEverydayRituals() {
-    return SliverToBoxAdapter(
+    return Padding(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Everyday Rituals',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          const Text(
+            'Everyday Rituals',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
             ),
           ),
-          SizedBox(
-            height: 180,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                final deities = ['Maa Kali', 'Lord Shiva', 'Lord Ganesha', 'Maa Lakshmi', 'Lord Hanuman'];
-                return _buildDeityCard(deities[index]);
-              },
-            ),
+          const SizedBox(height: 16),
+          _buildRitualCard(
+            'Daily Morning Aarti',
+            'Starts Daily at 6 AM',
+            '₹151',
+            'https://images.unsplash.com/photo-1604608672516-f1b9b1b1c1c1',
+            'Join',
+          ),
+          const SizedBox(height: 12),
+          _buildRitualCard(
+            'Simple Ganesha Homa',
+            'Every Friday',
+            '₹501',
+            'https://images.unsplash.com/photo-1582510003544-4d00b7f74220',
+            '',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDeityCard(String deity) {
+  Widget _buildRitualCard(String title, String subtitle, String price, String imageUrl, String tag) {
     return Container(
-      width: 140,
-      margin: const EdgeInsets.only(right: 12),
+      height: 120,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
         children: [
-          CircleAvatar(
-            radius: 35,
-            backgroundColor: AppTheme.templeCream,
-            child: const Icon(Icons.temple_hindu, size: 35, color: AppTheme.sacredBlue),
+          ClipRRect(
+            borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
+            child: Image.network(
+              imageUrl,
+              width: 120,
+              height: 120,
+              fit: BoxFit.cover,
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(deity, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text('Daily 6 AM', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-          const SizedBox(height: 4),
-          Text('👥 25', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-          const SizedBox(height: 8),
-          const Text('₹301', style: TextStyle(color: AppTheme.sacredBlue, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(0, 30)),
-            child: const Text('Join Today', style: TextStyle(fontSize: 12)),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        price,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                      if (tag.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E0),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            tag,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFFFF8C42),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -236,199 +354,38 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Widget _buildLifeBenefitPujas() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Life Benefit Pujas', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 1.3,
-              children: [
-                _buildBenefitCard('💼', 'Career &\nSuccess'),
-                _buildBenefitCard('💑', 'Marriage &\nLove'),
-                _buildBenefitCard('🏥', 'Health &\nHealing'),
-                _buildBenefitCard('💰', 'Wealth &\nProsperity'),
-                _buildBenefitCard('🎓', 'Education\nSuccess'),
-                _buildBenefitCard('🏠', 'Home &\nFamily'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBenefitCard(String emoji, String title) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 36)),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDoshNivaran() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Remove Astrological Doshas', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _buildDoshCard('Pitra Dosha', 'Ancestral blessings', '20 Nov', '₹701'),
-            _buildDoshCard('Manglik Dosha', 'Marriage harmony', '22 Nov', '₹901'),
-            _buildDoshCard('Kaal Sarp Dosha', 'Remove obstacles', '25 Nov', '₹1,101'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDoshCard(String name, String desc, String date, String price) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: AppTheme.templeCream,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.auto_fix_high, color: AppTheme.sacredBlue),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(desc, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-                const SizedBox(height: 4),
-                Text('📅 $date', style: TextStyle(fontSize: 11, color: Colors.grey.shade600)),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(price, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.sacredBlue)),
-              const SizedBox(height: 4),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.goldenAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  minimumSize: Size.zero,
-                ),
-                child: const Text('Book', style: TextStyle(fontSize: 12)),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSpecialOccasions() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Special Occasions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _buildOccasionCard('Ekadashi Special', '1008 Kamal Archana', 'Ettelutherumal Temple', '15 Nov', '45/100', '₹501'),
-            _buildOccasionCard('Purnima Puja', 'Satyanarayan Katha', 'Tirupati Temple', '18 Nov', '30/80', '₹701'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOccasionCard(String title, String ritual, String temple, String date, String slots, String price) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.goldenAccent.withOpacity(0.3)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)],
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppTheme.goldenAccent.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text('📅 $title', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-              ),
-            ],
+          const Text(
+            'Life Benefit Pujas',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
           ),
-          const SizedBox(height: 8),
-          Text('🔹 $ritual', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 4),
-          Text('📍 $temple', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-          const SizedBox(height: 4),
-          Text('🗓️ $date, Saturday', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('👥 $slots Slots Filled', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
-              Row(
-                children: [
-                  Text(price, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.sacredBlue)),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.goldenAccent),
-                    child: const Text('PARTICIPATE →'),
-                  ),
-                ],
+              Expanded(
+                child: _buildBenefitCard(
+                  'Maha Lakshmi Puja',
+                  'For wealth & prosperity',
+                  '₹1101',
+                  'https://images.unsplash.com/photo-1604608672516-f1b9b1b1c1c1',
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBenefitCard(
+                  'Rudra Abhishek',
+                  'For career success',
+                  '₹2101',
+                  'https://images.unsplash.com/photo-1582510003544-4d00b7f74220',
+                ),
               ),
             ],
           ),
@@ -437,80 +394,93 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
-  void _showFilterDrawer() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.8,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Filters', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+  Widget _buildBenefitCard(String title, String subtitle, String price, String imageUrl) {
+    return Container(
+      height: 140,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2D3748),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              imageUrl,
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.8),
                 ],
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          Positioned(
+            bottom: 12,
+            left: 12,
+            right: 12,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Category', style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: ['Daily', 'Special', 'Dosha', 'Life Benefits'].map((cat) {
-                        return FilterChip(label: Text(cat), onSelected: (val) {});
-                      }).toList(),
+                    Text(
+                      price,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                    const SizedBox(height: 16),
-                    const Text('Price Range', style: TextStyle(fontWeight: FontWeight.bold)),
-                    RangeSlider(values: const RangeValues(300, 1000), min: 100, max: 2000, onChanged: (val) {}),
-                    const SizedBox(height: 16),
-                    const Text('Sort By', style: TextStyle(fontWeight: FontWeight.bold)),
-                    RadioListTile(title: const Text('Upcoming Date'), value: 1, groupValue: 1, onChanged: (val) {}),
-                    RadioListTile(title: const Text('Price (Low to High)'), value: 2, groupValue: 1, onChanged: (val) {}),
-                    RadioListTile(title: const Text('Popularity'), value: 3, groupValue: 1, onChanged: (val) {}),
+                    const Icon(
+                      Icons.add_circle_outline,
+                      color: Color(0xFFFFE500),
+                      size: 20,
+                    ),
                   ],
                 ),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      child: const Text('Clear All'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.goldenAccent),
-                      child: const Text('Apply Filters'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
+
 }

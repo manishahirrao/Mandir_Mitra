@@ -16,9 +16,11 @@ import '../screens/blog_screen.dart';
 import '../screens/faq_screen.dart';
 import '../screens/about_screen.dart';
 import '../screens/settings_screen.dart';
+import '../screens/help_support_screen.dart';
 import '../screens/loyalty_screen.dart';
 import '../screens/tracking_screen.dart';
 import '../screens/live_stream_screen.dart';
+import '../screens/loved_ones_screen.dart';
 import '../models/ritual.dart';
 import '../models/temple.dart';
 import '../models/chadhava.dart';
@@ -60,7 +62,10 @@ class NavigationHelper {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BookingScreen(ritual: ritual),
+        builder: (context) => BookingScreen(
+          ritual: ritual!,
+          selectedPackage: 'basic',
+        ),
       ),
     );
   }
@@ -175,6 +180,16 @@ class NavigationHelper {
     );
   }
 
+  /// Navigate to Help & Support Screen
+  static void navigateToHelpSupport(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HelpSupportScreen(),
+      ),
+    );
+  }
+
   /// Navigate to About Screen
   static void navigateToAbout(BuildContext context) {
     Navigator.push(
@@ -220,7 +235,17 @@ class NavigationHelper {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LiveStreamScreen(streamId: streamId),
+        builder: (context) => LiveStreamScreen(ritualId: streamId),
+      ),
+    );
+  }
+
+  /// Navigate to Loved Ones Screen
+  static void navigateToLovedOnes(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LovedOnesScreen(),
       ),
     );
   }
